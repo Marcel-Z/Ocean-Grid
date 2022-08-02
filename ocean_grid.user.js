@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name		Grepotools.nl | Ocean Grid
-// @namespace	https://www.grepotools.nl/ocean_grid
-// @version		1.0
+// @namespace	https://www.grepotools.nl/
+// @version		1.0.1
 // @author		Marcel_Z
 // @description Grepotools.nl | Ocean Grid | Een grid systeem voor de Grepolis wereldkaart
 // @match       http://*.grepolis.com/game/*
@@ -99,14 +99,15 @@ background: url(https://www.grepotools.nl/ocean_grid/afbeeldingen/ocean_grid_bac
 `);
 
 // Global var | Ocean Grid
-var og_versie = "1.0";
+var og_versie = "1.0.1";
 var og_oceaan_afmeting = 2560;
 var og_aantal_rasters;
 var og_grid_html;
 var og_raster_letters =["A","B","C","D","E","F","G","H","I","J"];
+var kleuren ={wit:"#FFF", grijs:"#969696",zwart:"#000",rood:"#F00",bruin:"#BB5511",blauw:"#09F",paars:"#F0F",groen:"#399B1E",geel:"#FF0"};
 var og_raster_stap;
 var og_raster_zichtbaar;
-var og_raster_oc; 
+var og_raster_oc;
 var og_raster_grootte = {min: 2, max: 10};
 var og_menu_zichtbaar=0;
 var og_temp_waarde_instelling_select_01; // grid raster
@@ -324,6 +325,7 @@ $( document ).ready(function() {
 
     setInterval(grid_id, 100); // Grid id plaatsen en aan/uit zetten
     setInterval(loop_instellingen_venster, 100); // Functies instellingen menu venster
+
 })
 
 function toetsenbord_bediening (){
@@ -512,11 +514,11 @@ function grid_tekenen (){
 
     $('#og_kaart_oceangrid').html(grid_html);
     // Kleur tekst
-    $(".og_text").css("color", og_raster_kleur_tekst);
+    $(".og_text").css("color", kleuren[og_raster_kleur_tekst]);
     // kleur raster
-    $(".og_border_right").css("border-right-color", og_raster_kleur);
-    $(".og_border_bottom").css("border-bottom-color", og_raster_kleur);
-    $(".og_border").css("border-color", og_raster_kleur);
+    $(".og_border_right").css("border-right-color", kleuren[og_raster_kleur]);
+    $(".og_border_bottom").css("border-bottom-color", kleuren[og_raster_kleur]);
+    $(".og_border").css("border-color", kleuren[og_raster_kleur]);
 }
 
 // Met timer
@@ -570,11 +572,10 @@ function maak_raster_grootte_opties(){
 function maak_kleuren_opties(){
     var i=0;
     var og_kleuren_dropdown_opties = [];
-    var kleuren ={wit:"#FFF", grijs:"#969696",zwart:"#000",rood:"#F00",bruin:"#BB5511",blauw:"#09F",paars:"#F0F",groen:"#399B1E",geel:"#FF0"};
 
     for (var key in kleuren) {
          og_kleuren_dropdown_opties.push({
-            value: kleuren[key],
+            value: vertaling["nl"].og_instelling_kleuren[key],
             name: vertaling[grepo_taal].og_instelling_kleuren[key]
         })
     }
@@ -582,10 +583,9 @@ function maak_kleuren_opties(){
 }
 
 function maak_instellingen_venster() {
-
     // Menu links
     if (!$("#og_menu_links").get(0)) {
-        $(".settings-menu ul:last").append('<li id="og_menu_li"><img style="margin-top: 0px;height:15px;vertical-align: middle;"; id="og_menu_icon" src="https://www.grepotools.nl/ocean_grid/grepo_ocean_grid_setup_icon.png" ></div><a id="og_menu_links">Ocean Grid - Instellingen</a></li>');
+        $(".settings-menu ul:last").append('<li id="og_menu_li"><img style="margin-top: 0px;height:15px;vertical-align: middle;"; id="og_menu_icon" src="https://www.grepotools.nl/ocean_grid/afbeeldingen/ocean_grid_setup_icon.png" ></div><a id="og_menu_links">Ocean Grid - Instellingen</a></li>');
     }
 
     // Geklikt op ander menu
@@ -635,7 +635,7 @@ function maak_instellingen_venster() {
                                   })
                            )
                     .append($('<br>'))
-                    // Instelling grid tekstkleur
+                    // Instelling grid kleur
                     .append($('<label/>', {'for': 'og_instelling_grid_kleur'}).text(vertaling[grepo_taal].og_instelling_grid_kleur))
                     .append($('<div/>', {'id':'og_instelling_grid_kleur', 'class':'dropdown default'})
                              .dropdown({
@@ -654,6 +654,11 @@ function maak_instellingen_venster() {
                     .append("<div class='og_info'>Grepolis Ocean Grid: | "+vertaling[grepo_taal].versie+': '+og_versie+" | "+vertaling[grepo_taal].wereld+": "+grepo_world_data+" | "+vertaling[grepo_taal].taal+": "+grepo_taal+"<br><a id='og_link_website' href='https://www.grepotools.nl' target='_blank'>GrepoTools.nl</a> | 2022 - "+og_datum.getFullYear()+' | Marcel-Z </div>')
                    )
         )
+
+        // Waarde toekennen aan (caption) dropdown's zodat deze niet leeg zijn.
+        $("#og_instelling_grid_verdeling div.caption").html(og_aantal_rasters+ " x "+og_aantal_rasters);
+        $("#og_instelling_grid_tekst_kleur div.caption").html(vertaling[grepo_taal].og_instelling_kleuren[og_raster_kleur_tekst]);
+        $("#og_instelling_grid_kleur div.caption").html(vertaling[grepo_taal].og_instelling_kleuren[og_raster_kleur]);
 
         // verwerk grid aan/uit
         $("#og_instelling_grid_zichtbaar").click(function(){
